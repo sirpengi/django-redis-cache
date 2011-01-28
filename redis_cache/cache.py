@@ -44,15 +44,16 @@ class CacheClass(BaseCache):
             db = int(db)
         except (ValueError, TypeError):
             db = 1
-        if ':' in server:
-            host, port = server.split(':')
-            try:
-                port = int(port)
-            except (ValueError, TypeError):
-                port = 6379
-        else:
-            host = server or 'localhost'
+        loc = server.split(':')
+        host = loc[0]
+        try:
+            port = int(loc[1])
+        except (ValueError, TypeError, IndexError):
             port = 6379
+        try:
+            db = int(loc[2])
+        except (ValueError, TypeError, IndexError):
+            pass
         self._cache = redis.Redis(host=host, port=port, db=db, password=password)
 
     def make_key(self, key, version=None):
